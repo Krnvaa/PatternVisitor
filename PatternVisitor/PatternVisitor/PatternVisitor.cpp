@@ -8,12 +8,25 @@ struct BinaryOperation;
 struct FunctionCall;
 struct Variable;
 
+struct Transformer;
+
 struct Expression //базовая абстрактная структура
 {
-	virtual ~Expression() { } //виртуальный деструктор
+	virtual ~Expression() { }; //виртуальный деструктор
 	virtual double evaluate() const = 0; //абстрактный метод «вычислить»
 	virtual std::string print() const = 0;//абстрактный метод печать
+	virtual Expression * transform(Transformer* tr) const = 0;
 };
+struct Transformer
+{
+	virtual ~Transformer() {}
+	virtual Expression *transformNumber(Number const*) = 0;
+	virtual Expression *transformBinaryOperation(BinaryOperation const*) = 0;
+	virtual Expression *transformFunctionCall(FunctionCall const*) = 0;
+	virtual Expression *transformVariable(Variable const*) = 0;
+};
+
+
 struct Number : Expression // стуктура «Число»
 {
 	Number(double value) : value_(value) {} //конструктор
@@ -22,6 +35,10 @@ struct Number : Expression // стуктура «Число»
 	~Number() {}//деструктор, тоже виртуальный
 	//метод print() возвращает строковое представление числового значения объекта класса Number
 	std::string print() const {return std::to_string(this->value_);}
+	Expression * transform(Transformer *tr) const
+	{
+		return tr->transformNumber(this);
+	}
 
 private:
 	double value_; // само вещественное число
@@ -66,6 +83,10 @@ struct BinaryOperation : Expression // «Бинарная операция»
 		case MUL: return left * right;
 		}
 	}
+	Expression * transform(Transformer *tr) const
+	{
+		return tr->transformBinaryOperation(this);
+	}
 	std::string print() const {
 		return this->left_->print() + std::string(1, this->op_) + this->right_->print();
 	}
@@ -106,6 +127,10 @@ struct FunctionCall : Expression // структура «Вызов функци
 	std::string print() const {
 		return this->name_ + "(" + this->arg_->print() + ")";
 	}
+	Expression * transform(Transformer *tr) const
+	{
+		return tr->transformFunctionCall(this);
+	}
 private:
 	std::string const name_; // имя функции
 	Expression const *arg_; // указатель на ее аргумент
@@ -121,6 +146,10 @@ struct Variable : Expression // структура «Переменная»
 	}
 	std::string print() const {
 		return this->name_;
+	}
+	Expression * transform(Transformer *tr) const
+	{
+		return tr->transformVariable(this);
 	}
 private:
 	std::string const name_; // имя переменной
