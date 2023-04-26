@@ -155,8 +155,38 @@ private:
 	std::string const name_; // имя переменной
 };
 
+
+struct CopySyntaxTree : Transformer
+{
+	Expression *transformNumber(Number const *number)
+	{
+		Expression * exp = new Number(number->value());
+		return exp;
+	}
+	Expression *transformBinaryOperation(BinaryOperation const *binop)
+	{
+		Expression * exp = new BinaryOperation((binop->left())->transform(this),
+			binop->operation(),
+			(binop->right())->transform(this));
+		return exp;
+	}
+	Expression *transformFunctionCall(FunctionCall const *fcall)
+	{
+		Expression * exp = new FunctionCall(fcall->name(),
+			(fcall->arg())->transform(this));
+		return exp;
+	}
+	Expression *transformVariable(Variable const *var)
+	{
+		Expression *exp = new Variable(var->name());
+		return exp;
+	}
+	~CopySyntaxTree() { };
+};
+
 int main()
 {
+	/*
 	//------------------------------------------------------------------------------
 	Expression * e1 = new Number(1.234);
 	Expression * e2 = new Number(-1.234);
@@ -171,6 +201,17 @@ int main()
 	Expression* mult = new BinaryOperation(n2, BinaryOperation::MUL, callSqrt);
 	Expression* callAbs = new FunctionCall("abs", mult);
 	cout << callAbs->evaluate() << endl;
-	//
+	//------------------------------------------------------------------------------
+	   */
+	Number* n32 = new Number(32.0);
+	Number* n16 = new Number(16.0);
+	BinaryOperation* minus = new BinaryOperation(n32, BinaryOperation::MINUS, n16);
+	FunctionCall* callSqrt = new FunctionCall("sqrt", minus);
+	Variable* var = new Variable("var");
+	BinaryOperation* mult = new BinaryOperation(var, BinaryOperation::MUL, callSqrt);
+	FunctionCall* callAbs = new FunctionCall("abs", mult);
+	CopySyntaxTree CST;
+	Expression* newExpr = callAbs->transform(&CST);
+	std::cout << newExpr->print() << std::endl;
 }
 

@@ -1,3 +1,4 @@
 ﻿  UnitTest1.cpp
-d:\patternvisitor\patternvisitor\patternvisitor\patternvisitor.cpp(68): warning C4715: BinaryOperation::evaluate: значение возвращается не при всех путях выполнения
+d:\patternvisitor\patternvisitor\patternvisitor\patternvisitor.cpp(85): warning C4715: BinaryOperation::evaluate: значение возвращается не при всех путях выполнения
+     ╤ючфрхЄё  сшсышюЄхър D:\PatternVisitor\PatternVisitor\Debug\UnitTest1.lib ш юс·хъЄ D:\PatternVisitor\PatternVisitor\Debug\UnitTest1.exp
   UnitTest1.vcxproj -> D:\PatternVisitor\PatternVisitor\Debug\UnitTest1.dll
